@@ -6,7 +6,7 @@
 #include <string.h>
 #include <format>
 
-#define LOG_LEVEL LOG_LEVEL_INFO
+#define LOG_LEVEL LOG_LEVEL_TRACE
 
 
 enum LogLevel {
@@ -25,17 +25,17 @@ inline constexpr std::string_view  LOG_LEVEL_STRINGS[7] = { "ALL  ", "TRACE", "I
 
 /////////////////////////  Background logger functionality not in namespace to avoid confusion  ///////////////////////////
 
-using customlog_LogHandler = std::function<void(int Level, const std::string_view& Module, const std::string_view& Message)>;  // Define function signature
+using microlog_LogHandler = std::function<void(int Level, const std::string_view& Module, const std::string_view& Message)>;  // Define function signature
 
 // Get logHandler vector
-inline std::vector<customlog_LogHandler>& customlog_getLogHandlers() {
-    static std::vector<customlog_LogHandler> handlers;
+inline std::vector<microlog_LogHandler>& microlog_getLogHandlers() {
+    static std::vector<microlog_LogHandler> handlers;
     return handlers;
 }
 
 // Call all log handlers
-inline void customlog_CallLoggers(int level, const std::string_view& module, const std::string_view& msg) {
-    for (customlog_LogHandler& handler : customlog_getLogHandlers()) {
+inline void microlog_CallLoggers(int level, const std::string_view& module, const std::string_view& msg) {
+    for (microlog_LogHandler& handler : microlog_getLogHandlers()) {
         handler(level, module, msg);
     }
 }
@@ -43,7 +43,7 @@ inline void customlog_CallLoggers(int level, const std::string_view& module, con
 // Macro for defining logging functions
 #define DEFINE_LOG_FN(NAME, LEVEL) \
     inline void NAME(const std::string_view& module, const std::string_view& msg) { \
-        if constexpr (LOG_LEVEL <= LEVEL) customlog_CallLoggers(LEVEL, module, msg); \
+        if constexpr (LOG_LEVEL <= LEVEL) microlog_CallLoggers(LEVEL, module, msg); \
     }
 
 
@@ -59,8 +59,8 @@ namespace Log {
     DEFINE_LOG_FN(Alarm, LOG_LEVEL_ALARM)
     DEFINE_LOG_FN(Abort, LOG_LEVEL_ABORT)
 
-    inline void addLogger(const customlog_LogHandler& handler) {
-        customlog_getLogHandlers().push_back(handler);
+    inline void addLogger(const microlog_LogHandler& handler) {
+        microlog_getLogHandlers().push_back(handler);
         Info("Logger", "New log handler added");
     }
 }
