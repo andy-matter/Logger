@@ -16,7 +16,7 @@ int main(void) {
   Log::addLogger(SerialLogHandler);   // Add the log-handler to the logger
 
   while(1) {
-    Log::Alarm("Main", "This is a alarm");    // Passing the module and message to the logger
+    Log::Alarm("Main", "This is an alarm");    // Passing the module and message to the logger
     Log::Trace("Main", std::format("Value is {:.2f}", value));    // Use format to include variables
   }
 }
